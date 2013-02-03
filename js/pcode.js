@@ -1876,8 +1876,10 @@
     },
     makeDefineDisposeFun = function (objDefine) {
         if (objDefine.dispose) return;
+        objDefine.isDisposed = false;
         objDefine.dispose = function () {
-            if (this.dispose != $pcode.noop) {
+            if (!this.isDisposed) {
+                this.isDisposed = true;
                 this.dispose = $pcode.noop;
                 //if (this.Event && this.Event.has && this.Event.has("onDispose"))
                 if (this.Event && this.Event.has)
@@ -1892,6 +1894,8 @@
                     }
                 }
                 $pcode.clearObject(this);
+                this.isDisposed = true;
+                this.dispose = $pcode.noop;
             }
         };
         objDefine.islinkToDom = false;
@@ -1937,6 +1941,7 @@
         t = null;
     },
     makeObjectAttributeSelfFun = function (obj, parent) {
+        //生成$this()方法
         obj["$this"] = function () {
             return parent;
         };

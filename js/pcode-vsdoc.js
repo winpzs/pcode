@@ -580,12 +580,12 @@
                 n = list[i];
                 if (!$pcode.isNullEmpty(n)) {
                     if ($pcode.isNull(ot[n]))
-                        ot[n] = new Function("$pcode.Class.ResetObject(this);if (this.init) this.init.apply(this, arguments);");
+                        ot[n] = new Function("$pcode.Class.ResetObject(this);");
                     ot = ot[n];
                 }
             }
             if (ot[list[len]]) return ot[list[len]];
-            return ot[list[len]] = new Function("$pcode.Class.ResetObject(this);if (this.init) this.init.apply(this, arguments);");
+            return ot[list[len]] = new Function("$pcode.Class.ResetObject(this);");
         },
         getClassDefine: function (className) {
             var list = className.split('.');
@@ -642,6 +642,7 @@
                 /// 联接到DOM, 当DOM给删除时调用callback, 只能联一个
             	/// </summary>
             	/// <param name="jqSelector"></param>
+                    return $pcode.linkToDom(jqSelector);
                 jqSelector = null;
             };
             objDefine = null;
@@ -748,11 +749,23 @@
                 /// <returns type="Boolean"></returns>
                 return true;
             };
-            this.privateDefineClass.define.getBaseMethod = function (methodname, pos) {
+            this.privateDefineClass.define.baseApply = function (methodname, pos, args) {
                 /// <summary>
-                /// 取得上级方法
+                /// 调用基类方法(apply)
+                /// <para>baseApply("init", 0, arguments)</para>
                 /// </summary>
-                return $pcode.noop;
+                /// <param name="methodname">基类方法名称</param>
+                /// <param name="pos"></param>
+                /// <param name="args">arguments</param>
+            };
+            this.privateDefineClass.define.baseCall = function (methodname, pos, params) {
+                /// <summary>
+                /// 调用基类方法(call)
+                /// <para>baseCall("init", 0, "1", "2")</para>
+                /// </summary>
+                /// <param name="methodname">基类方法名称</param>
+                /// <param name="pos"></param>
+                /// <param name="params">多个参数</param>
             };
             this.privateDefineClass.define["$classname"] = $pcode.stringEmpty;
             extend && this.Extend(extend);
@@ -809,9 +822,12 @@
                 }
             });
             this.Define({
+                isDisposed:false,
                 dispose: $pcode.noop,
                 islinkToDom: true,
-                linkToDom: function (jqSelector) { }
+                linkToDom: function (jqSelector) {
+                    return $pcode.linkToDom(jqSelector);
+                }
             });
             //var $this = this;
             //this.privateDefineClass.define.getDefineObject = function () { return $this; };
